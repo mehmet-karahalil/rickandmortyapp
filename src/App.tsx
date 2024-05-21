@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Select from 'react-select';
+import Select, { components } from 'react-select';
 import { apiRequest } from './core/request';
 
 const App: React.FC = () => {
@@ -57,11 +57,19 @@ const App: React.FC = () => {
       </span>
     );
   };
+  const MultiValue = (props: any) => {
+    return (
+      <components.MultiValue {...props}>
+        <span>{props.data.value}</span>
+      </components.MultiValue>
+    );
+  };
+
   return (
     <div className="w-100">
       <div className="container d-flex flex-column align-items-center justify-content-center vh-100">
         <div className="w-100 d-flex flex-wrap border p-2">
-          <Select
+        <Select
             ref={selectRef}
             isMulti
             options={characters}
@@ -69,8 +77,33 @@ const App: React.FC = () => {
             onChange={handleSelect}
             value={selectedItems}
             className="w-100"
+
+            styles={{
+              option: (baseStyles, state) => ({
+                ...baseStyles,
+                borderColor: state.isSelected ? 'grey' : 'red',
+                backgroundColor: state.isSelected ? 'grey' : state.isFocused ? 'lightgrey' : 'white',
+
+              }),
+            }}
             placeholder="Ara ve seç..."
-            noOptionsMessage = {() => <div style={{ color: 'red', fontWeight: 'bold' }}>🔍 Henüz arama yapılmadı...</div>}/>
+            noOptionsMessage={() => <div style={{ color: 'red', fontWeight: 'bold' }}>🔍 Henüz arama yapılmadı...</div>}
+            formatOptionLabel={({ label, value }) => (
+              <div className="d-flex align-items-center">
+                <input
+                  type="checkbox"
+                  checked={selectedItems.some(item => item.value === value)}
+                  className="me-2"
+                  readOnly
+                />
+                {label}
+              </div>
+            )}
+            getOptionLabel={({ label }) => label}
+            hideSelectedOptions={false}
+            components={{ MultiValue }}
+          />
+            
         </div>
       </div>
     </div>
